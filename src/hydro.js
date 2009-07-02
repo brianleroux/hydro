@@ -11,33 +11,6 @@
  * - library and dependency free 
  * - utilizes localStorage
  * - super tiny so it will load fast using HTML5 cache manifest
- *
- * Example usage
- * -------------
- * // something like this in an onLoad event to create a profile
- * var environment = new Hydro({ manifest:'simple-manifest.js' });
- * 
- * // simple-manifest.js
- * {
- * 	// the virtual environment profile to be loaded
- * 	"current":"0.0.1",
- * 
- * 	// available virtual environments profiles
- * 	"profiles":{
- * 		"0.0.1":[
- * 		   	{"name":"xui", "url":"../src/js/lib/xui-min.js"},
- * 			{"name":"fail", "url":"exists-it-does-not.js"}
- * 		]
- * 	}
- * }
-
-TODO
-====
-- lib not found exception
-- automaticUpdate();
-- force(version)
-- syntax check
-- cleanup w/ a lib iterator
  * 
  */
 var Hydro = function(options) {
@@ -55,6 +28,9 @@ Hydro.prototype = {
 		
 		that.manifestUrl = options.manifest;
 		that.update = options.update;
+		
+		// force a reload on dev mode
+		if (options.mode == 'dev') that.clear();
 		
 		// first run populates manifest and then loads the appropriate libs
 		if (that.firstrun()) {
@@ -122,6 +98,7 @@ Hydro.prototype = {
 	},
 	
 	initializeLibrary:function(js) {
+		var hydro = this;
 		eval(js);
 	},
 	
@@ -150,6 +127,11 @@ Hydro.prototype = {
 	// sets an key and value to a store
 	set:function(key, value) {
 		localStorage.setItem(key, value);
+	},
+	
+	// clears the local storage
+	clear:function() {
+		localStorage.clear();
 	},
 	
 	// returns the manifest as a navigatable JSON object
